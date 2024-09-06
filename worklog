@@ -7,7 +7,13 @@
   composer require symfony/orm-pack
   composer require symfony/serializer-pack
 4. Frame endpoints
-@todo
 5. Security
   composer require symfony/security-bundle
   implement API-key (key = JWT)
+  set access to proper endpoints
+
+
+
+
+@todo list
+  Transform exceptions into JSON
