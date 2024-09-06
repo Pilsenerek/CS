@@ -1,6 +1,5 @@
 1. Environment
 2. Symfony skeleton
-@todo
 3. Useful bundles:
   composer require symfony/maker-bundle --dev
   composer require symfony/apache-pack
@@ -8,6 +7,7 @@
   composer require symfony/orm-pack
   composer require symfony/serializer-pack
 4. Frame endpoints
+@todo
 5. Security
   composer require symfony/security-bundle
   implement API-key (key = JWT)
