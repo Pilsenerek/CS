@@ -11,9 +11,13 @@
   composer require symfony/security-bundle
   implement API-key (key = JWT)
   set access to proper endpoints
+6. Loan entity + repository
+7. Loan adding, form, validation
+  composer require form validator
 
+@todo
+  Loan calculator service
+  Response DTOs
 
-
-
-@todo list
-  Transform exceptions into JSON
+Notices:
+  Transform exceptions into JSON -> it's enough send header accept:application/json
