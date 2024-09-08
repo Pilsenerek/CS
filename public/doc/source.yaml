@@ -1,0 +1,281 @@
+#API project in OpenAPI (Swagger) standard, .yml format, paste below in https://editor.swagger.io/
+
+openapi: 3.0.3
+info:
+  title: "Loans Calculator REST API"
+  description: |
+    # Project description
+    You can use: https://editor.swagger.io/
+
+  contact:
+    email: michalzbieranek@wp.pl
+  version: 1.0.0
+
+paths:
+  /loan/calculate:
+    get:
+      summary: "Get calculations list"
+      tags:
+        - Main endpoints
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/accept'
+        - $ref: '#/components/parameters/status'
+      responses:
+        200:
+          description: Calculations list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalculationResponse'
+              examples:
+                Correct response:
+                  $ref: '#/components/examples/CalculationResponseList'
+
+    post:
+      summary: "Add calculation"
+      tags:
+        - Main endpoints
+      parameters:
+        - $ref: '#/components/parameters/accept'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Calculation'
+            examples:
+              Correct input:
+                $ref: '#/components/examples/Calculation'
+              Incorrect input:
+                $ref: '#/components/examples/CalculationIncorrect'
+      responses:
+        201:
+          description: Calculation is added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
+              examples:
+                Correct response:
+                  $ref: '#/components/examples/CalculationResponse'
+        400:
+          description: Incorrect request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              examples:
+                IncorrectResponse:
+                  summary: Your request is not correct
+                  value:
+                    amount:
+                      - "This value should be a multiple of 500."
+                    installment:
+                      - "This value should be between 3 and 18."
+
+  /loan/calculate/{loanId}/status:
+    patch:
+      summary: "Set calculation status as excluded"
+      tags:
+        - Main endpoints
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/accept'
+        - $ref: '#/components/parameters/loanId'
+      responses:
+        200:
+          description: Calculation is excluded
+        404:
+          description: Calculation not found
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  parameters:
+    loanId:
+      name: loanId
+      in: path
+      description: Loan ID
+      required: true
+      schema:
+        type: integer
+      example: 12345
+
+    status:
+      name: status
+      in: query
+      description: Calculation status (1 = new, 0 = excluded)
+      required: false
+      schema:
+        type: integer
+        enum: [0, 1]
+      example: 1
+
+    accept:
+      name: accept
+      in: header
+      required: false
+      schema:
+        type: string
+        enum: ['application/json']
+      example: 'application/json'
+
+
+  schemas:
+    Calculation:
+      title: "Calculation"
+      type: object
+      properties:
+        amount:
+          type: integer
+          minimum: 1000
+          maximum: 12000
+          description: Amount, must be divisible by 500
+        installments:
+          type: integer
+          minimum: 3
+          maximum: 18
+          description: Number of installments, must be divisible by 3
+      required:
+        - amount
+        - installments
+
+    CalculationResponse:
+      title: "Calculation response"
+      type: object
+      properties:
+        loan:
+          type: object
+          description: Loan meta data
+          properties:
+            id:
+              type: integer
+            amount:
+              type: string
+            installments:
+              type: integer
+            interestAmount:
+              type: string
+            interestRate:
+              type: string
+            createdAt:
+              type: string
+              format: 'date-time'
+          required:
+            - id
+            - amount
+            - installments
+            - interestAmount
+            - interestRate
+            - createdAt
+        schedule:
+          type: array
+          items:
+            title: "Installment"
+            type: object
+            properties:
+              number:
+                type: integer
+              amount:
+                type: string
+              interest:
+                type: string
+              capital:
+                type: string
+            required:
+              - number
+              - amount
+              - interest
+              - capital
+      required:
+        - loan
+        - schedule
+
+    ValidationError:
+      type: array
+      title: Error messages
+      items:
+        type: array
+        title: Field error messages
+        items:
+          type: string
+
+  examples:
+    Calculation:
+      summary: Correct request
+      value:
+        amount: 1000
+        installments: 9
+
+    CalculationIncorrect:
+      summary: Incorrect request
+      value:
+        amount: 1234
+        installments: 33
+
+    CalculationResponse:
+      summary: Calculation response
+      value:
+        loan:
+          id: 38,
+          amount: "5 000,00"
+          installments: 9
+          interestAmount: "260,60"
+          interestRate: "12,34"
+          createdAt: "2024-09-08 09:57:05"
+        schedule:
+          -
+            number: 1
+            amount: "584,51"
+            interest: "51,42"
+            capital: "533,09"
+          -
+            number: 2
+            amount: "584,51"
+            interest: "45,93"
+            capital: "538,58"
+
+    CalculationResponseList:
+      summary: ffrewgrege
+      value:
+        - loan:
+            id: 38,
+            amount: "5 000,00"
+            installments: 9
+            interestAmount: "260,60"
+            interestRate: "12,34"
+            createdAt: "2024-09-08 09:57:05"
+          schedule:
+            - number: 1
+              amount: "584,51"
+              interest: "51,42"
+              capital: "533,09"
+            - number: 2
+              amount: "584,51"
+              interest: "45,93"
+              capital: "538,58"
+        - loan:
+            id: 35,
+            amount: "9 000,00"
+            installments: 3
+            interestAmount: "185,74"
+            interestRate: "12,34"
+            createdAt: "2024-09-08 08:12:23"
+          schedule:
+            - number: 1
+              amount: "3061,91"
+              interest: "92,55"
+              capital: "2 969,36"
+            - number: 2
+              amount: "3 061,92"
+              interest: "62,02"
+              capital: "2 999,90"

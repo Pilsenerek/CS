@@ -14,9 +14,11 @@
 `php bin/phpunit`
 
 # Configuration
-API key & interest, see `/.env`
+API key & interest rate: `/.env`
 
 # API doc
 File in OpenAPI standard:
 `/public/doc/source.yaml`
 can be used with: https://editor.swagger.io/
+
+**Important:** JWT token is used as API key and provided as `Authorization: "Bearer eyJhbGciOiJ..."`
