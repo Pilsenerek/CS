@@ -12,8 +12,8 @@ use App\Model\LoanResponse;
 use App\Repository\LoanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -110,7 +110,7 @@ class LoanService
 
     /**
      * @param Loan $loan
-     * @param Installment[]
+     * @param Installment[] $installments
      * @throws ExceptionInterface
      */
     private function prepareResponse(Loan $loan, array $installments): array
@@ -122,7 +122,7 @@ class LoanService
     }
 
     /**
-     * @param Installment[]
+     * @param Installment[] $installments
      * @return InstallmentResponse[]
      */
     private function prepareInstallmentResponse(array $installments): array
@@ -135,7 +135,7 @@ class LoanService
         return $result;
     }
 
-    private function retrieveErrors(Form $form): JsonResponse
+    private function retrieveErrors(FormInterface $form): JsonResponse
     {
         $errors = [];
         foreach ($form->getErrors(true) as $error) {
