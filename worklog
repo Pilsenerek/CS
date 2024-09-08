@@ -18,7 +18,7 @@
   composer require --dev symfony/test-pack
   Response Models/DTOs
   connect calculation with adding Loan
-@todo
 9 Loan status update
-10 Loan list
+10 Loans list
+@todo
 11 API doc

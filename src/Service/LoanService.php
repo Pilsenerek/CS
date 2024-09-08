@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Loan;
+use App\Enum\LoanStatus;
 use App\Form\LoanType;
 use App\Model\Installment;
 use App\Model\InstallmentResponse;
 use App\Model\LoanResponse;
+use App\Repository\LoanRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Form;
@@ -20,11 +22,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class LoanService
 {
+    private const CALCULATIONS_LIMIT = 4;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormFactoryInterface   $formFactory,
         private NormalizerInterface    $normalizer,
         private LoanCalcService        $calcService,
+        private LoanRepository $loanRepository,
         #[Autowire('%loanInterest%')] private int $loanInterest
     )
     {
@@ -46,13 +51,50 @@ class LoanService
                 $this->entityManager->persist($loan);
                 $this->entityManager->flush();
 
-                return $this->prepareResponse($loan, $installments);
+                return new JsonResponse($this->prepareResponse($loan, $installments), Response::HTTP_CREATED);
             }
 
             return $this->retrieveErrors($form);
         }
 
         return new JsonResponse(['Wrong form request'], Response::HTTP_BAD_REQUEST);
+    }
+
+    public function excludeLoan(int $loanId): JsonResponse
+    {
+        /* @var $loan Loan */
+        $loan = $this->loanRepository->find($loanId);
+        if (empty($loan)) {
+
+            return new JsonResponse([], Response::HTTP_NOT_FOUND);
+        }
+        $loan->setStatus(LoanStatus::EXCLUDED);
+        $this->entityManager->flush();
+
+        return new JsonResponse([]);
+    }
+
+    /**
+     * @throws ExceptionInterface
+     */
+    public function list(Request $request): JsonResponse
+    {
+        $returnData = [];
+        $criteria = [];
+        //@todo implement Form & validation
+        $status = $request->get('status');
+        if (\in_array($status, ['0', '1'])) {
+            $criteria = ['status' => LoanStatus::from((int)$status)];
+        }
+        $loans = $this->loanRepository->findBy($criteria, ['id' => 'DESC'], self::CALCULATIONS_LIMIT);
+        \usort($loans, function ($a, $b) {
+            return $b->getInterestAmount() <=> $a->getInterestAmount();
+        });
+        foreach ($loans as $loan) {
+            $returnData[] = $this->prepareResponse($loan, $this->calcService->calculateInstallments($loan));
+        }
+
+        return new JsonResponse($returnData);
     }
 
     /**
@@ -71,12 +113,12 @@ class LoanService
      * @param Installment[]
      * @throws ExceptionInterface
      */
-    private function prepareResponse(Loan $loan, array $installments): JsonResponse
+    private function prepareResponse(Loan $loan, array $installments): array
     {
-        return new JsonResponse([
+        return [
             'loan' => $this->normalizer->normalize(LoanResponse::createFromLoan($loan)),
             'schedule' => $this->normalizer->normalize($this->prepareInstallmentResponse($installments)),
-        ], Response::HTTP_CREATED);
+        ];
     }
 
     /**
@@ -102,5 +144,4 @@ class LoanService
 
         return new JsonResponse($errors, Response::HTTP_BAD_REQUEST);
     }
-
 }

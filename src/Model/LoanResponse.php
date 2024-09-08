@@ -22,10 +22,10 @@ class LoanResponse
     {
         return new LoanResponse(
             $loan->getId(),
-            number_format($loan->getAmount() / 100, 2, ',', ' '),
+            \number_format($loan->getAmount() / 100, 2, ',', ' '),
             $loan->getInstallments(),
-            number_format($loan->getInterestAmount() / 100, 2, ',', ' '),
-            number_format($loan->getInterestRate() / 100, 2, ',', ' '),
+            \number_format($loan->getInterestAmount() / 100, 2, ',', ' '),
+            \number_format($loan->getInterestRate() / 100, 2, ',', ' '),
             $loan->getCreatedAt()->format('Y-m-d H:i:s'),
         );
     }

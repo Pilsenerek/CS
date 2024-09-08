@@ -9,21 +9,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 class LoanController extends AbstractController
 {
-
     public function __construct(private LoanService $loanService)
     {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/loan/calculate', name: 'loan_calculate_list', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        return $this->json([__METHOD__]);
+        return $this->loanService->list($request);
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/loan/calculate', name: 'loan_calculate_add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
@@ -35,6 +41,6 @@ class LoanController extends AbstractController
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function status(Request $request): JsonResponse
     {
-        return $this->json([__METHOD__ => $request->get('loanId')]);
+        return $this->loanService->excludeLoan((int)$request->get('loanId'));
     }
 }

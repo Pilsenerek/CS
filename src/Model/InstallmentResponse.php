@@ -14,12 +14,13 @@ class InstallmentResponse
     {
     }
 
-    public static function createFromInstallment(Installment $installment):static{
+    public static function createFromInstallment(Installment $installment): static
+    {
         return new InstallmentResponse(
             $installment->getNumber(),
-            number_format($installment->getAmount()/100, 2, ',', ' '),
-            number_format($installment->getInterest()/100, 2, ',', ' '),
-            number_format($installment->getCapital()/100, 2, ',', ' ')
+            \number_format($installment->getAmount() / 100, 2, ',', ' '),
+            \number_format($installment->getInterest() / 100, 2, ',', ' '),
+            \number_format($installment->getCapital() / 100, 2, ',', ' ')
         );
     }
 
