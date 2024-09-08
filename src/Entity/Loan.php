@@ -57,13 +57,6 @@ class Loan
         return $this->interestRate;
     }
 
-//    public function setInterestRate(int $interestRate): static
-//    {
-//        $this->interestRate = $interestRate;
-//
-//        return $this;
-//    }
-
     public function getInterestAmount(): int
     {
         return $this->interestAmount;
@@ -81,24 +74,10 @@ class Loan
         return $this->amount;
     }
 
-//    public function setAmount(int $amount): static
-//    {
-//        $this->amount = $amount;
-//
-//        return $this;
-//    }
-
     public function getInstallments(): int
     {
         return $this->installments;
     }
-
-//    public function setInstallments(int $installments): static
-//    {
-//        $this->installments = $installments;
-//
-//        return $this;
-//    }
 
     public function getStatus(): LoanStatus
     {
@@ -116,11 +95,4 @@ class Loan
     {
         return $this->createdAt;
     }
-
-//    public function setCreatedAt(\DateTimeInterface $createdAt): static
-//    {
-//        $this->createdAt = $createdAt;
-//
-//        return $this;
-//    }
 }

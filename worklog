@@ -14,10 +14,11 @@
 6. Loan entity + repository
 7. Loan adding, form, validation
   composer require form validator
-
+8 Loan calculator service
+  composer require --dev symfony/test-pack
+  Response Models/DTOs
+  connect calculation with adding Loan
 @todo
-  Loan calculator service
-  Response DTOs
-
-Notices:
-  Transform exceptions into JSON -> it's enough send header accept:application/json
+9 Loan status update
+10 Loan list
+11 API doc
